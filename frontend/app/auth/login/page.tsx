@@ -87,14 +87,16 @@ export default function Login() {
             const { accessToken, id, username, email, isAdmin, ...other } = responseData.data;
 
             // set token
-            setCookie('token', accessToken, { 'max-age': '86400', 'path': '/', 'SameSite': 'Strict' });
+            const setCookiesAsync = async () => {
+                setCookie('token', accessToken, { 'max-age': '86400', 'path': '/', 'SameSite': 'Strict' });
+                setCookie('userId', id, { 'max-age': '86400', 'path': '/', 'SameSite': 'Strict' });
+                setCookie('username', username, { 'max-age': '86400', 'path': '/', 'SameSite': 'Strict' });
+                setCookie('isAdmin', isAdmin.toString(), { 'max-age': '86400', 'path': '/', 'SameSite': 'Strict' });
+            };
 
-            // set user info
-            setCookie('userId', id, { 'max-age': '86400', 'path': '/', 'SameSite': 'Strict' });
-            setCookie('username', username, { 'max-age': '86400', 'path': '/', 'SameSite': 'Strict' });
-            setCookie('isAdmin', isAdmin.toString(), { 'max-age': '86400', 'path': '/', 'SameSite': 'Strict' });
-
-            router.push("/questions");
+            await setCookiesAsync().then(() => {
+                router.push('/questions');
+            });
         } catch (error) {
             if (!isErrorSet) {
                 setError("Something went wrong. Please retry shortly.");

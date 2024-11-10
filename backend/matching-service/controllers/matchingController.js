@@ -4,7 +4,7 @@ const EventEmitter = require('events');
 const uuid = require("uuid");
 
 const QUEUE_TIME = 30000;
-const BATCH_INTERVAL = 10000;
+const BATCH_INTERVAL = 3000;
 
 // Kafka setup
 const kafka = new Kafka({
@@ -92,6 +92,8 @@ const matchmakeUser = async (userId, userName, questions) => {
 }
 
 const dequeueUser = async (userId) => {
+    userQueueMap.delete(userId);
+    dequeued.set(userId, true);
     eventEmitter.emit(`dequeue-${userId}`);
 }
 
@@ -141,19 +143,7 @@ const batchProcess = () => {
     let questionDict = new Map();
     let unmatchedUsers = new Map();
 
-    // Remove duplicate users, keeping only the most recent instance
-    let uniqueUsers = new Map();
-    for (const user of batch) {
-        if (uniqueUsers.has(user.userId)) {
-            if (user.enqueueTime > uniqueUsers.get(user.userId).enqueueTime) {
-                uniqueUsers.set(user.userId, user);
-            }
-        } else {
-            uniqueUsers.set(user.userId, user);
-        }
-    }
-    
-    batch = Array.from(uniqueUsers.values());
+
 
     batch.forEach((user) => {
         if (!dequeued.has(user.userId)) {

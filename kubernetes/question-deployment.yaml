@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: question
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: question
+  template:
+    metadata:
+      labels:
+        app: question
+    spec:
+      containers:
+        - image: asia-southeast1-docker.pkg.dev/tokyo-crossbar-440806-u9/peerprep/question:latest
+          name: question
+          ports:
+            - containerPort: 2000
+              protocol: TCP
+          imagePullPolicy: Always
+      restartPolicy: Always

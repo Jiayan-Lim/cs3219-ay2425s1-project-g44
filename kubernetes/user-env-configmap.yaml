@@ -1,0 +1,16 @@
+apiVersion: v1
+data:
+  BACKUP_EMAIL_PASS: vvkj xhtv twsf roeh
+  BACKUP_EMAIL_USER: peerprep.no.reply@gmail.com
+  DB_CLOUD_URI: mongodb+srv://pewggls:osGEKKXddhYyew10@cluster0.vccw4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+  DB_LOCAL_URI: mongodb://127.0.0.1:27017/peerprepUserServiceDB
+  EMAIL_PASS: vhgj idnk fhme ooim
+  EMAIL_USER: peerprep9@gmail.com
+  ENV: PROD
+  FRONTEND_HOST: http://localhost
+  FRONTEND_PORT: "3000"
+  JWT_SECRET: you-can-replace-this-with-your-own-secret
+  PORT: "3001"
+kind: ConfigMap
+metadata:
+  name: user-env

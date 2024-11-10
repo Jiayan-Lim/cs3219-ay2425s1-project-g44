@@ -24,7 +24,7 @@ export default function UserQuestionHistory() {
   const router = useRouter();
   const [history, setHistory] = useState<QuestionHistory[]>([]);
   const [loading, setLoading] = useState(true);
-  const userId = useRef(null);
+  const userId = useRef<string | null>(null);
 
   // Fetch questions history from backend API
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function UserQuestionHistory() {
           })
         );
 
-        setHistory(mappedQuestions);
+        setHistory(mappedQuestions.reverse());
       } catch (err) {
         console.log("Error fetching questions from server:", err)
       } finally {

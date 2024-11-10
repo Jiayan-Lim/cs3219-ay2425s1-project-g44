@@ -6,8 +6,16 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+      args:
+        PUBLIC_URL: ${PUBLIC_URL}
+        WS_PUBLIC_URL: ${WS_PUBLIC_URL}
+        FRONTEND_PORT: ${FRONTEND_PORT}
+        QUESTION_API_PORT: ${QUESTION_API_PORT}
+        USER_API_PORT: ${USER_API_PORT}
+        MATCHING_API_PORT: ${MATCHING_API_PORT}
+        COLLAB_API_PORT: ${COLLAB_API_PORT}
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     develop:
       watch:
         - action: sync
@@ -19,7 +27,7 @@ services:
       context: ./backend/question-service
       dockerfile: Dockerfile.dev
     ports:
-      - "2000:2000"
+      - "${QUESTION_API_PORT}:2000"
     develop:
       watch:
         - action: sync
@@ -33,7 +41,7 @@ services:
     env_file:
       - ./backend/user-service/.env
     ports:
-      - "3001:3001"
+      - "${USER_API_PORT}:3001"
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.7.1
@@ -73,14 +81,14 @@ services:
     environment:
       KAFKA_BROKER: kafka:9092
     ports:
-      - "3002:3002"
+      - "${MATCHING_API_PORT}:3002"
     depends_on:
       kafka:
         condition: service_healthy
 
-  signaling-service:
+  collab-service:
     build:
-      context: ./backend/signaling-service
+      context: ./backend/collab-service
       dockerfile: Dockerfile.dev
     ports:
-      - "3003:3003"
+      - "${COLLAB_API_PORT}:3003"

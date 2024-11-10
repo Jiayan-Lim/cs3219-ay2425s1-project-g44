@@ -24,7 +24,7 @@ export default function TextEditor({ sessionId, provider }: TextEditorProps) {
             }),
             CollaborationCursor.configure({
                 provider: provider,
-                user: { name: getUsername(), color: '#' + Math.floor(Math.random() * 16777215).toString(16) },
+                user: { name: getUsername(), color: '#E9D7FE' },
             }),
         ]
 

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+          image: confluentinc/cp-zookeeper:7.7.1
+          livenessProbe:
+            exec:
+              command:
+                - echo
+                - ruok
+                - '|'
+                - nc
+                - localhost
+                - "2181"
+                - '|'
+                - grep
+                - imok
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: zookeeper
+          ports:
+            - containerPort: 2181
+              protocol: TCP
+      restartPolicy: Always

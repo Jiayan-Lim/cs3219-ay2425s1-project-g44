@@ -12,7 +12,10 @@ export async function loadThemes(monacoInstance: typeof monaco) {
         for (const [key, label] of Object.entries(themeGroup)) {
             await import(`./${label}.json`).then(data => {
                 monacoInstance.editor.defineTheme(key, data);
-                themes.push({ value: key, label });
+                const themeExists = themes.some(theme => theme.value === key);
+                if (!themeExists) {
+                    themes.push({ value: key, label });
+                }
             });
         }
     }

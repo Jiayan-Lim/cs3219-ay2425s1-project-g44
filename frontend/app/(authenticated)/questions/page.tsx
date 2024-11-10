@@ -301,34 +301,30 @@ export default function Questions() {
         };
     }, []);
 
-    const ws1 = useRef<WebSocket | null>(null); // WebSocket reference
     const handleCancel = useCallback(() => {
         setIsMatching(false);
-        if (ws1.current === null || ws1.current.readyState === WebSocket.CLOSED || ws1.current.readyState === WebSocket.CLOSING) {
-            console.log("Connecting to web socket for matching service ...")
-            // Initialize WebSocket connection if not already matching
-            ws1.current = new WebSocket(process.env.NEXT_PUBLIC_MATCHING_API_URL || 'ws://localhost:3002/matching');
-            console.log(ws1.current.readyState)
-        }
-        ws1.current.onopen = () => {
-            console.log("WebSocket connection opened");
+        
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             const message = {
                 event: "dequeue",
-                userId: userInfo.current.id,
+                userId: getUserId(),
             };
+    
+            ws.current.send(JSON.stringify(message));
+            console.log("Sent dequeue request:", message);
 
-            ws.current?.send(JSON.stringify(message));
-        };
-
-        ws1.current.onmessage = (event) => {
-            if (event.data == "Welcome to websocket server") {
-                console.log("receive welcome msg from websocket server")
-                return;
-            }
-            const message = JSON.parse(event.data);
-            console.log("message receive from websocket", message);
+            ws.current.close();
+            ws.current = null;
         }
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            if (isMatching) {
+                handleCancel();
+            }
+        };
+    }, [handleCancel, isMatching]);
 
     useEffect(() => {
         timeout.current = false;
@@ -357,7 +353,8 @@ export default function Questions() {
 
     useEffect(() => {
         if (isMatchFoundDialogOpen) {
-            setRedirectTime(3);
+            router.prefetch('/session/[id]');
+            setRedirectTime(2);
             const redirectTimer = setInterval(() => {
                 setRedirectTime((prevTime) => {
                     if (prevTime <= 1) {
@@ -497,7 +494,7 @@ export default function Questions() {
                                 filteredQuestions.map((question) => (
                                     <div id="qns" key={question.id} className="relative mr-2">
                                         <Card
-                                            className="rounded-lg flex items-start border-none shadow-none p-4 w-full cursor-pointer hover:drop-shadow-question-card transition ease-in-out"
+                                            className="rounded-lg flex items-start border-none shadow-none p-4 w-full hover:drop-shadow-question-card transition ease-in-out"
                                             onClick={() => setSelectedViewQuestion(question)}
                                         >
                                             <div className="flex-1">
@@ -615,7 +612,7 @@ export default function Questions() {
                     )}
                 </div>
 
-                <div className="flex flex-col h-max gap-2 px-2.5">
+                {/* <div className="flex flex-col h-max gap-2 px-2.5">
                     <Accordion type="single" collapsible>
                         <AccordionItem value="item-1">
                             <AccordionTrigger>Past attempts</AccordionTrigger>
@@ -632,7 +629,7 @@ export default function Questions() {
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
-                </div>
+                </div> */}
             </div>
 
             <Dialog open={isMatchFoundDialogOpen}>

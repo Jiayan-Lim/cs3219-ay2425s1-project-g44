@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Copy, Flag, MessageSquareText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from "@/components/ui/sonner"
 import { useSearchParams } from 'next/navigation';
 import { getCookie, setCookie } from '@/app/utils/cookie-manager';
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from '@/components/ui/badge';
+import { Badge, BadgeProps } from '@/components/ui/badge';
 import Editor from "@monaco-editor/react";
 import { toast } from "sonner"
 import Markdown from 'react-markdown'
+import SessionLoading from '@/app/session/loading';
 
 type Question = {
     id: number;
@@ -22,9 +23,10 @@ type Question = {
 }
 
 function getTimeAgo(attemptDate: Date | null) {
+    if (!attemptDate) return "N/A";
     const now = new Date();
 
-    const diffInMs = now - attemptDate; // Difference in milliseconds
+    const diffInMs = now.getTime() - attemptDate.getTime(); // Difference in milliseconds
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
@@ -40,7 +42,7 @@ function getTimeAgo(attemptDate: Date | null) {
     }
 }
   
-export default function CodeViewer() {
+function CodeViewerContent() {
   const searchParams = useSearchParams();
   const questionId = searchParams.get("questionId");
   const [attemptDate, setAttemptDate] = useState<Date | null>(null);
@@ -103,7 +105,8 @@ export default function CodeViewer() {
         setCode(JSON.parse(data.code))
         setLanguage(data.language)
       } catch (err) {
-        console.error(err.message);
+        const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+        console.error(errorMessage);
         toast.dismiss();
         toast.error("Failed to load the code. Please try again later.");
       }
@@ -112,24 +115,24 @@ export default function CodeViewer() {
     fetchAttemptDetails();
   }, [questionId]);
 
-  const handleEditorDidMount = (editor) => {
-    editor.getDomNode().classList.add("my-custom-editor");
+//   const handleEditorDidMount = (editor: ) => {
+//     editor.getDomNode().classList.add("my-custom-editor");
 
-    // Insert scoped tooltip styles
-    const style = document.createElement("style");
-    style.textContent = `
-        .my-custom-editor .monaco-tooltip {
-            z-index: 1000 !important;
-            position: absolute;
-        }
-    `;
-    document.head.appendChild(style);
+//     // Insert scoped tooltip styles
+//     const style = document.createElement("style");
+//     style.textContent = `
+//         .my-custom-editor .monaco-tooltip {
+//             z-index: 1000 !important;
+//             position: absolute;
+//         }
+//     `;
+//     document.head.appendChild(style);
 
-    // Cleanup on component unmount
-    return () => {
-        document.head.removeChild(style);
-    };
-};
+//     // Cleanup on component unmount
+//     return () => {
+//         document.head.removeChild(style);
+//     };
+// };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(code).then(() => {
@@ -139,13 +142,13 @@ export default function CodeViewer() {
   };
 
   return (
-    <div className="flex gap-4 min-h-screen px-10 pt-24 pb-5">
+    <div className="flex gap-4 min-h-screen px-10 pt-24 pb-5 text-primary">
         {/* Left Panel: Question Details */}
-        <ScrollArea className="w-1/2 p-4 border rounded-lg shadow bg-white">
-            <h3 className="text-3xl font-serif font-large tracking-tight">
+        <ScrollArea className="w-1/2 p-6 border rounded-lg shadow bg-white">
+            <h3 className="text-2xl font-serif font-large tracking-tight">
                 {questionDetails?.title || ""}
             </h3>
-            <div className="flex items-center gap-10 mt-8">
+            <div className="flex items-center gap-10 mt-3">
                 <div className="flex items-center gap-2">
                     <Flag className="h-4 w-4 text-icon" />
                     <Badge
@@ -159,7 +162,7 @@ export default function CodeViewer() {
                 <div className="flex items-center gap-2">
                     <MessageSquareText className="h-4 w-4 text-icon" />
                     {questionDetails?.category?.length > 0 &&
-                     questionDetails?.category.map((category) => (
+                    questionDetails?.category.map((category) => (
                         <Badge
                             key={category}
                             variant="category"
@@ -170,10 +173,7 @@ export default function CodeViewer() {
                     ))}
                 </div>
             </div>
-            <p className="mt-8 text-l text-foreground">
-                {questionDetails?.description || ""}
-            </p>
-            <Markdown className="mt-8 prose prose-zinc prose-code:bg-zinc-200 prose-code:px-1 prose-code:rounded prose-code:prose-pre:bg-inherit text-sm text-foreground proportional-nums">
+            <Markdown className="mt-8 prose prose-zinc prose-code:bg-zinc-200 prose-code:px-1 prose-code:rounded prose-code:prose-pre:bg-inherit text-base text-foreground proportional-nums">
                 {questionDetails?.description || ""}
             </Markdown>
         </ScrollArea>
@@ -199,6 +199,7 @@ export default function CodeViewer() {
                         readOnly: true,
                         minimap: { enabled: false },
                         lineNumbers: "on",
+                        fontFamily: 'monospace',
                         fontSize: 14,
                         padding: { top: 10, bottom: 10 },
                         scrollBeyondLastLine: false,
@@ -214,4 +215,12 @@ export default function CodeViewer() {
         <Toaster position="top-center" />
     </div>
   );
+}
+
+export default function CodeViewer() {
+    return (
+        <Suspense fallback={<SessionLoading />}>
+            <CodeViewerContent />
+        </Suspense>
+    );
 }

@@ -30,3 +30,29 @@ jobs:
       - name: Run Tests
         working-directory: backend/question-service
         run: npm run test-ci
+
+      - name: Google Cloud Authentication
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: tokyo-crossbar-440806-u9
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          export_defauly_credentials: true
+      
+      - name: Configure Docker for Google Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+
+      - name: Build and push Docker images
+        run: |
+          docker compose build
+          services=("frontend" "matching-service" "question" "signaling-service" "user")
+          for service in "${services[@]}"; do
+            image="asia-southeast1-docker.pkg.dev/tokyo-crossbar-440806-u9/peerprep/$service:latest"
+            docker tag "cs3219-ay2425s1-project-g44-$service" "$image"
+            docker push "$image"
+          done

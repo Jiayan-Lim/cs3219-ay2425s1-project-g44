@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signaling-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: signaling-service
+  template:
+    metadata:
+      labels:
+        app: signaling-service
+    spec:
+      containers:
+        - image: asia-southeast1-docker.pkg.dev/tokyo-crossbar-440806-u9/peerprep/signaling-service:latest
+          name: signaling-service
+          ports:
+            - containerPort: 3003
+              protocol: TCP
+          imagePullPolicy: Always
+      restartPolicy: Always

@@ -2,6 +2,35 @@
 # CS3219 Project (PeerPrep) - AY2425S1
 ## Group: G44
 
+### Running PeerPrep
+Before you run PeerPrep, please check the `.env` file in the root directory, and modify the IP address/URL and/or ports if necessary. It should look something like this:
+```sh
+# URLs - change these to your local or cloud deployment IP address/URL if necessary
+PUBLIC_URL=http://localhost
+WS_PUBLIC_URL=ws://localhost
+
+# Port numbers - change these if you are already using these ports for other (non-PeerPrep) services
+FRONTEND_PORT=3000
+QUESTION_API_PORT=2000
+USER_API_PORT=3001
+MATCHING_API_PORT=3002
+COLLAB_API_PORT=3003
+```
+
+Then, in the root directory, run
+```sh
+docker compose up -d
+```
+and access PeerPrep at [localhost:3000](http://localhost:3000), or the IP address/URL you set earlier in the `.env` file
+
+> To force a rebuild of the images, run
+> `docker compose up -d --build`
+
+#### Developing
+If you are developing PeerPrep, you can use [Compose Watch](https://docs.docker.com/compose/how-tos/file-watch/) to automatically update and preview code changes:
+```sh
+docker compose up --watch --build
+```
 
 ### API Endpoints
 #### Question Service
@@ -58,22 +87,6 @@ Replies with:
   "event": "dequeue",
   "userId": <ID of this user>,
 }
-```
-
-### Running PeerPrep
-In the root directory, run
-```sh
-docker compose up -d
-```
-and access PeerPrep at [localhost:3000](http://localhost:3000)
-
-> To force a rebuild of the images, run
-> `docker compose up -d --build`
-
-#### Developing
-If you are developing PeerPrep, you can use [Compose Watch](https://docs.docker.com/compose/how-tos/file-watch/) to automatically update and preview code changes:
-```sh
-docker compose up --watch --build
 ```
 
 ### Note: 

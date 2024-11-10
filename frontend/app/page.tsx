@@ -14,7 +14,7 @@ export default function Landing() {
                     <div className="flex flex-col w-[350px] gap-1 items-start font-serif font-light text-3xl text-primary tracking-tight">
                         <p>Prep for your next interview with your Peers</p>
                     </div>
-                    <div className="flex gap-4 pt-10 laptop:pt-20 items-center text-sm text-muted-foreground">
+                    <div className="flex gap-4 pt-10 items-center text-sm text-muted-foreground">
                         <Button asChild variant="outline" size="lg" className="rounded-full px-6 border-brand-300 hover:border-brand-100 text-brand-600">
                             <Link href="/auth/login" className="">Login</Link>
                         </Button>

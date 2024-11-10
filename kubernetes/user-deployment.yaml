@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      containers:
+        - env:
+            - name: BACKUP_EMAIL_PASS
+              valueFrom:
+                configMapKeyRef:
+                  key: BACKUP_EMAIL_PASS
+                  name: user-env
+            - name: BACKUP_EMAIL_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: BACKUP_EMAIL_USER
+                  name: user-env
+            - name: DB_CLOUD_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_CLOUD_URI
+                  name: user-env
+            - name: DB_LOCAL_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_LOCAL_URI
+                  name: user-env
+            - name: EMAIL_PASS
+              valueFrom:
+                configMapKeyRef:
+                  key: EMAIL_PASS
+                  name: user-env
+            - name: EMAIL_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: EMAIL_USER
+                  name: user-env
+            - name: ENV
+              valueFrom:
+                configMapKeyRef:
+                  key: ENV
+                  name: user-env
+            - name: FRONTEND_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: FRONTEND_HOST
+                  name: user-env
+            - name: FRONTEND_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: FRONTEND_PORT
+                  name: user-env
+            - name: JWT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: JWT_SECRET
+                  name: user-env
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: PORT
+                  name: user-env
+          image: asia-southeast1-docker.pkg.dev/tokyo-crossbar-440806-u9/peerprep/user:latest
+          name: user
+          ports:
+            - containerPort: 3001
+              protocol: TCP
+          imagePullPolicy: Always
+      restartPolicy: Always

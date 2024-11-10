@@ -136,6 +136,21 @@ export default function CodeEditor({ sessionId, provider, setLanguage }: CodeEdi
 
     const [langOpen, setLangOpen] = useState(false)
     const [lang, setLang] = useState("javascript")
+    
+    const ymap = bindingRef.current?.doc.getMap('editorSettings');
+    ymap?.observe((event) => {
+        if (event.keysChanged.has('lang')) {
+            const newLang = ymap.get('lang');
+            monaco?.editor.setModelLanguage(editorRef.current!.getModel()!, newLang as string);
+            setLang(newLang as string);
+        }
+    });
+
+    function setLangPropagate(newLang: string) {
+        setLang(newLang);
+        ymap?.set('lang', newLang);
+    }
+
     function langCombobox() {
         return <Popover open={langOpen} onOpenChange={setLangOpen}>
             <PopoverTrigger asChild>
@@ -164,7 +179,7 @@ export default function CodeEditor({ sessionId, provider, setLanguage }: CodeEdi
                                     value={l.value}
                                     onSelect={(currentValue) => {
                                         monaco?.editor.setModelLanguage(editorRef.current!.getModel()!, currentValue);
-                                        setLang(currentValue);
+                                        setLangPropagate(currentValue);
                                         setLanguage(currentValue);
                                         setLangOpen(false);
                                     }}
@@ -202,7 +217,7 @@ export default function CodeEditor({ sessionId, provider, setLanguage }: CodeEdi
                 onMount={handleEditorDidMount}
                 theme={theme}
                 options={{
-                    fontSize: 13,
+                    fontSize: 14,
                     fontFamily: 'monospace',
                     bracketPairColorization: {
                         enabled: true

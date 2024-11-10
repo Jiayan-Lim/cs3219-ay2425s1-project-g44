@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matching-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matching-service
+  template:
+    metadata:
+      labels:
+        app: matching-service
+    spec:
+      containers:
+        - env:
+            - name: KAFKA_BROKER
+              value: kafka:9092
+          image: asia-southeast1-docker.pkg.dev/tokyo-crossbar-440806-u9/peerprep/matching-service:latest
+          name: matching-service
+          ports:
+            - containerPort: 3002
+              protocol: TCP
+          imagePullPolicy: Always
+      restartPolicy: Always

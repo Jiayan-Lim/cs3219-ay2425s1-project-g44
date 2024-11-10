@@ -1,6 +1,6 @@
 "use client"
  
-import { Badge } from "@/components/ui/badge";
+import { Badge, BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { ColumnDef } from "@tanstack/react-table"
@@ -98,7 +98,7 @@ export const columns : ColumnDef<QuestionHistory>[]= [
         const rowCategories = row.getValue(id);
         console.log(selectedCategories);
         console.log(rowCategories);
-        return selectedCategories.every(category => rowCategories.includes(category));
+        return selectedCategories.every((category: string) => (rowCategories as string[]).includes(category));
     },
     },
     {
@@ -153,7 +153,7 @@ export const columns : ColumnDef<QuestionHistory>[]= [
         )
       },
       accessorKey: "attemptTime",
-      cell: ({ row }) => <div className="flex items-center justify-center h-full">{ Math.ceil(row.getValue("attemptTime")/60)}</div>,
+      cell: ({ row }) => <div className="flex items-center justify-center h-full">{ Math.ceil(row.original.attemptTime/60)}</div>,
     //   Cell: ({ value }) => Math.floor(value / 60), // Convert time spent in seconds to minutes
     },
     {
@@ -170,7 +170,7 @@ export const columns : ColumnDef<QuestionHistory>[]= [
       },
       accessorKey: "attemptDate",
       cell: ({ row }) => {
-        const attemptDate = row.getValue("attemptDate");
+        const attemptDate = row.original.attemptDate;
         return new Date(attemptDate).toLocaleString("en-GB", {
           day: "2-digit",
           month: "2-digit",

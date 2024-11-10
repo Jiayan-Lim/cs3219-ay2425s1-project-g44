@@ -55,13 +55,14 @@ export default function AuthenticatedLayout({
         const authenticateUser = async () => {
             const token = getCookie('token');
             if (!token || await isTokenExpired(token)) {
+                deleteAllCookies();
                 router.push('/auth/login');
                 return;
             }
 
-            // if non-admin user tries to access repo, redirect user to question page
+             // if non-admin user tries to access repo, redirect user to question page
             if (pathname.includes('/question-repo') && !isUserAdmin()) {
-                router.push('/questions');
+                router.replace('/questions');
                 return;
             }
         };
